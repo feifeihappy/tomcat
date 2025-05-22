@@ -161,6 +161,7 @@ public final class ApplicationFilterChain implements FilterChain {
             throws IOException, ServletException {
 
         // Call the next filter if there is one
+        //1. 所谓：责任链未执行完的情况下执行责任链
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
             try {
@@ -209,6 +210,7 @@ public final class ApplicationFilterChain implements FilterChain {
                 Object[] args = new Object[] { req, res };
                 SecurityUtil.doAsPrivilege("service", servlet, classTypeUsedInService, args, principal);
             } else {
+                //2.执行后续业务逻辑
                 servlet.service(request, response);
             }
         } catch (IOException | ServletException | RuntimeException e) {
