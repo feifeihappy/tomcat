@@ -1,9 +1,41 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
+title Filter.doFilter 执行流程
 autonumber
-actor   user
+autoactivate on
+actor   tomcat
 
-'待编写
+participant  Filter
+participant  MyFilter
+participant  FilterChain
+participant  ApplicationFilterChain
+participant  Servlet
+participant  HttpServlet
 
+
+
+tomcat -> Filter: doFilter
+Filter -> MyFilter: doFilter
+note right
+自有过滤器，执行自定义逻辑
+end note
+MyFilter -> FilterChain: doFilter
+FilterChain -> ApplicationFilterChain: doFilter
+ApplicationFilterChain -> ApplicationFilterChain: internalDoFilter
+note left
+<color:red> 1.责任链执行：</color>
+- 责任链未执行完的情况下执行责任链
+- 执行完的情况下执行Servlet
+<color:red>2: 责任链构建</color>
+- ApplicationFilterChain.addFilter （添加过滤器）
+- private ApplicationFilterConfig[] filters （容器）
+end note
+ApplicationFilterChain -> Servlet: service
+Servlet -> HttpServlet: service
+HttpServlet -> HttpServlet: service
+HttpServlet -> HttpServlet: doGet
+note left
+springmvc 接管请求，执行后续逻辑
+end note
 @enduml
